@@ -1,0 +1,29 @@
+@PointClass base(Targetname) iconsprite("editor/env_object.vmt") = env_object :  "Base game object."
+[
+	texturename(material)    : "Texture" : : "Path to sprite."
+	obj_scale(float)    : "Scale of object" : : "Scale."
+	obj_sound(sound)    : "Sound" : : "Sound triggerable on entity pickup if Item option choisen."
+	brightness(integer)    : "Brightness" : : "How bright object need to be."
+	output OnTouchedEntity(void) : "Fires when entity got touched (¬‿¬)."
+
+	obj_type(Choices) : "Object Type" : 0 : "Type of object that this entity is." =
+    [
+        0 : "Obstacle"
+        1 : "Item"
+    ]
+]
+
+@PointClass base(Targetname) iconsprite("editor/env_pp.vmt") = env_postprocessing :  "Apply PP shaders to player."
+[
+	shadername(string) : "Shader Name" :: "Shader to apply"
+]
+
+@PointClass base(Targetname) iconsprite("editor/env_velocity.vmt") = env_velocity :  "Apply velocity to player."
+[
+	activity(boolean) : "Activity" : 1 : "Is entity active?"
+	dir(vector) : "Direction" : "0 0 0" : "Direction of impulse."
+
+	input ApplyVelocity(void) : "Applies velocity."
+	input Enable(void) : "Enable the entity."
+	input Disable(void) : "Disable the entity."
+]
