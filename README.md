@@ -1,2 +1,2 @@
 # entities
-entities from mine mod
+entities from my mod
