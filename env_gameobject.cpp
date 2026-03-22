@@ -19,8 +19,9 @@ public:
 		m_bActive = false;
 		m_TextureName = NULL_STRING;
 		m_SoundName = NULL_STRING;
-		m_flScale = 1;
+		m_flScale = 1.0f;
 		m_iBrightness = 255;
+		m_iPoints = 0;
 	}
 
 	CSprite* m_pEyeFlash;
@@ -32,31 +33,34 @@ public:
 	void MoveThink(void);
 
 	void Touch(CBaseEntity* pOther);
+	void AddPoint(CBasePlayer* pPlayer);
 
 private:
 	bool m_bActive;
 	float m_flScale;
 	int m_iBrightness;
 	int m_iObjectType;
+	int m_iPoints;
 	string_t m_TextureName;
 	string_t m_SoundName;
 };
 
 LINK_ENTITY_TO_CLASS(env_object, CGameObject);
 
-	BEGIN_DATADESC(CGameObject)
+BEGIN_DATADESC(CGameObject)
 
-	DEFINE_FIELD(m_bActive, FIELD_BOOLEAN),
+DEFINE_FIELD(m_bActive, FIELD_BOOLEAN),
 
-	DEFINE_KEYFIELD(m_TextureName, FIELD_STRING, "texturename"),
-	DEFINE_KEYFIELD(m_SoundName, FIELD_STRING, "obj_sound"),
-	DEFINE_KEYFIELD(m_flScale, FIELD_FLOAT, "obj_scale"),
-	DEFINE_KEYFIELD(m_iBrightness, FIELD_INTEGER, "brightness"),
-	DEFINE_KEYFIELD(m_iObjectType, FIELD_INTEGER, "obj_type"),
+DEFINE_KEYFIELD(m_TextureName, FIELD_STRING, "texturename"),
+DEFINE_KEYFIELD(m_SoundName, FIELD_STRING, "obj_sound"),
+DEFINE_KEYFIELD(m_flScale, FIELD_FLOAT, "obj_scale"),
+DEFINE_KEYFIELD(m_iBrightness, FIELD_INTEGER, "brightness"),
+DEFINE_KEYFIELD(m_iObjectType, FIELD_INTEGER, "obj_type"),
+DEFINE_KEYFIELD(m_iPoints, FIELD_INTEGER, "add_points"),
 
-	DEFINE_OUTPUT(m_OnTouchedEntity, "OnTouchedEntity"),
+DEFINE_OUTPUT(m_OnTouchedEntity, "OnTouchedEntity"),
 
-	DEFINE_ENTITYFUNC(Touch),
+DEFINE_ENTITYFUNC(Touch),
 
 END_DATADESC()
 
@@ -72,21 +76,23 @@ void CGameObject::Precache(void) {
 	PrecacheSound(STRING(m_SoundName));
 }
 
-void CGameObject::Touch(CBaseEntity *pOther)
+void CGameObject::Touch(CBaseEntity* pOther)
 {
+	CBasePlayer* pPlayer = ToBasePlayer(pOther);
 
 	if (m_iObjectType == 0)
 		return;
 
-    if (pOther->IsPlayer()) {
+	if (pOther->IsPlayer()) {
 		EmitSound(STRING(m_SoundName));
 
 		m_OnTouchedEntity.FireOutput(pOther, this);
+		AddPoint(pPlayer);
 
-        SetTouch(nullptr);
+		SetTouch(nullptr);
 		UTIL_Remove(this);
 		UTIL_Remove(m_pEyeFlash); // i forgor
-    }
+	}
 }
 
 void CGameObject::Spawn(void) {
@@ -105,4 +111,14 @@ void CGameObject::Spawn(void) {
 	m_pEyeFlash->SetTransparency(kRenderTransTexture, 255, 255, 255, 0, kRenderFxNoDissipation);
 	m_pEyeFlash->SetBrightness(m_iBrightness);
 	m_pEyeFlash->SetScale(m_flScale);
+}
+
+void CGameObject::AddPoint(CBasePlayer* pPlayer) {
+
+	CSingleUserRecipientFilter filter(pPlayer);
+	filter.MakeReliable();
+
+	UserMessageBegin(filter, "UpdateCounter");
+	WRITE_SHORT(m_iPoints);
+	MessageEnd();
 }
