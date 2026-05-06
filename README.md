@@ -1,2 +1,2 @@
 # entities
-entities from my mod
+entities from abandoned mod
