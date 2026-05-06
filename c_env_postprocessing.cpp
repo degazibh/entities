@@ -31,6 +31,6 @@ void C_ScreenOverlay::Precache(void) {
 void C_ScreenOverlay::Spawn(void) {
     Precache();
 
-    IMaterial* pMaterial = materials->FindMaterial(TOSTRING(ShaderName), TEXTURE_GROUP_OTHER, true);
+    IMaterial* pMaterial = materials->FindMaterial(STRING(ShaderName), TEXTURE_GROUP_OTHER, true);
     view->SetScreenOverlayMaterial(pMaterial);
 }
